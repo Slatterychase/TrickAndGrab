@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "SWeapon.h"
 #include "SCharacter.generated.h"
+
 
 //Tells compiler it is a class
 class UCameraComponent;
@@ -37,10 +39,19 @@ protected:
 
 	void EndZoom();
 
+	void ScrollEquipmentUp();
+
+	void ScrollEquipmentDown();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
+	TArray<UClass*> Weapons;
+
+	UINT currentEquipmentSlot;
+	UINT maxEquipmentSize;
 
 
 

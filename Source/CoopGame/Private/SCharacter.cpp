@@ -27,6 +27,9 @@ ASCharacter::ASCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	currentEquipmentSlot = 0;
+	maxEquipmentSize = Weapons.Num() - 1;
+
 }
 
 FVector ASCharacter::GetPawnViewLocation() const
@@ -74,6 +77,22 @@ void ASCharacter::BeginZoom()
 void ASCharacter::EndZoom()
 {
 	SpringArmComp->TargetArmLength = 160;
+}
+
+void ASCharacter::ScrollEquipmentUp()
+{
+	currentEquipmentSlot++;
+	if (currentEquipmentSlot > maxEquipmentSize) {
+		currentEquipmentSlot = 0;
+	}
+}
+
+void ASCharacter::ScrollEquipmentDown()
+{	
+	currentEquipmentSlot--;
+	if (currentEquipmentSlot < 0) {
+		currentEquipmentSlot = maxEquipmentSize;
+	}
 }
 
 
