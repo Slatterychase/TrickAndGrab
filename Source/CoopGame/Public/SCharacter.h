@@ -11,6 +11,7 @@
 //Tells compiler it is a class
 class UCameraComponent;
 class USpringArmComponent;
+class ASWeapon;
 
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
@@ -43,16 +44,48 @@ protected:
 
 	void ScrollEquipmentDown();
 
+	void EquipWeapon(ASWeapon* equippedWeapon);
+
+	void ToggleWeapon(int32 equipSlot);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	TArray<UClass*> Weapons;
+	TArray<ASWeapon*> Weapons;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
+	ASWeapon* currentGun;
+	
+	ASWeapon* previousGun;
+	int32 currentEquipmentSlot;
+	
+	int32 maxEquipmentSize;
 
-	UINT currentEquipmentSlot;
-	UINT maxEquipmentSize;
+	ASWeapon* gun;
+	
+	bool bWantsToZoom;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float ZoomedFOV;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player", meta = (ClampMin = 0.1, ClampMax = 100))
+	float ZoomInterpSpeed;
+
+	float DefaultFOV;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	FName socketName;
+
+	ASWeapon* CurrentWeapon;
+
+	void Fire();
+
+	void StartFire();
+	void EndFire();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASWeapon> StarterWeaponClass;
 
 
 public:	

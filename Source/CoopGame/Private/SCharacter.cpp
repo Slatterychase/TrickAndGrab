@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "SWeapon.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -28,8 +29,12 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	currentEquipmentSlot = 0;
-	maxEquipmentSize = Weapons.Num() - 1;
+	ZoomedFOV = 65.0f;
+	ZoomInterpSpeed = 20;
 
+	socketName = "Weapon Socket";
+	
+	
 }
 
 FVector ASCharacter::GetPawnViewLocation() const
@@ -45,7 +50,27 @@ FVector ASCharacter::GetPawnViewLocation() const
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	/*for (int32 x = 0; x <= Weapons.Num(); x++) {
+		gun = GetWorld()->SpawnActor<AActor>(Weapons[0], GetActorLocation(), FRotator::ZeroRotator);
+		gun->SetOwner(GetOwner());
+		socketName = "Weapon Socket";
+		gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+		currentGun = gun;
+	}*/
+
+	DefaultFOV = CameraComp->FieldOfView;
+	//Spawn default weapon
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+	if (CurrentWeapon) {
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
+
+	}
+
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -71,36 +96,69 @@ void ASCharacter::EndCrouch()
 
 void ASCharacter::BeginZoom()
 {
-	SpringArmComp->TargetArmLength = 80;
+	bWantsToZoom = true;
 }
 
 void ASCharacter::EndZoom()
 {
-	SpringArmComp->TargetArmLength = 160;
+	bWantsToZoom = false;
 }
 
 void ASCharacter::ScrollEquipmentUp()
 {
-	currentEquipmentSlot++;
+	/*maxEquipmentSize = Weapons.Num() - 1;
+	++currentEquipmentSlot;
 	if (currentEquipmentSlot > maxEquipmentSize) {
 		currentEquipmentSlot = 0;
 	}
+	gun->SetActorHiddenInGame = false;
+	gun = GetWorld()->SpawnActor<AActor>(Weapons[0], GetActorLocation(), FRotator::ZeroRotator);
+	gun->SetOwner(GetOwner());
+	socketName = "Weapon Socket";
+	gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);*/
+	
+	
+	
+	
 }
 
 void ASCharacter::ScrollEquipmentDown()
 {	
-	currentEquipmentSlot--;
-	if (currentEquipmentSlot < 0) {
-		currentEquipmentSlot = maxEquipmentSize;
-	}
+	//maxEquipmentSize = Weapons.Num() - 1;
+	//--currentEquipmentSlot;
+	//if (currentEquipmentSlot < 0) {
+	//	currentEquipmentSlot = maxEquipmentSize;
+	//}
+	//previousGun = gun;
+	//gun = GetWorld()->SpawnActor<AActor>(Weapons[0], GetActorLocation(), FRotator::ZeroRotator);
+	//gun->SetOwner(GetOwner());
+	//socketName = "Weapon Socket";
+	//gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+	//currentGun = gun;
 }
 
 
+
+
+
+
+void ASCharacter::Fire()
+{
+	if (CurrentWeapon) {
+		CurrentWeapon->Fire();
+	}
+}
 
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//true first, false second option
+	float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
+
+	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
+	CameraComp->SetFieldOfView(NewFOV);
 
 }
 
@@ -122,6 +180,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ASCharacter::EndZoom);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	
+	PlayerInputComponent->BindAction("InventoryUp", IE_Pressed, this, &ASCharacter::ScrollEquipmentUp);
+	PlayerInputComponent->BindAction("InventoryDown", IE_Pressed, this, &ASCharacter::ScrollEquipmentDown);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASCharacter::Fire);
 }
 
