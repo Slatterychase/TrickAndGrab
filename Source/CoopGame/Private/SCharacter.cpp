@@ -146,6 +146,11 @@ void ASCharacter::ScrollEquipmentDown()
 	}
 }
 
+void ASCharacter::ToggleFireMode()
+{
+	CurrentWeapon->SwapFireType();
+}
+
 
 
 
@@ -192,5 +197,6 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("InventoryUp", IE_Pressed, this, &ASCharacter::ScrollEquipmentUp);
 	PlayerInputComponent->BindAction("InventoryDown", IE_Pressed, this, &ASCharacter::ScrollEquipmentDown);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASCharacter::Fire);
+	PlayerInputComponent->BindAction("ToggleFire", IE_Pressed, this, &ASCharacter::ToggleFireMode);
 }
 

@@ -48,6 +48,8 @@ protected:
 
 	void ToggleWeapon(int32 equipSlot);
 
+	void ToggleFireMode();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

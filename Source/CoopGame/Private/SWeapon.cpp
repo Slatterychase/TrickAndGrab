@@ -25,6 +25,7 @@ ASWeapon::ASWeapon()
 	RootComponent = MeshComp;
 
 	MuzzleSocketName = "MuzzleSocket";
+	AltFireType = false;
 
 }
 
@@ -65,7 +66,7 @@ void ASWeapon::Fire()
 			switch (SurfaceType)
 			{
 			case SURFACE_FLESHDEFAULT:
-				SelectedEffect = FleshImpactEffect;
+				SelectedEffect = SmallFleshImpactEffect;
 					break;
 			case SURFACE_FLESHVULNERABLE:
 				SelectedEffect = FleshImpactEffect;
@@ -92,6 +93,11 @@ void ASWeapon::Fire()
 
 	}
 	
+}
+
+void ASWeapon::SwapFireType()
+{
+	AltFireType = !AltFireType;
 }
 
 void ASWeapon::PlayFireEffects(FVector TracerEndPoint)
