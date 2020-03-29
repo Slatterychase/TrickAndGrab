@@ -53,7 +53,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	TArray<ASWeapon*> Weapons;
+	TArray<TSubclassOf<ASWeapon>> Weapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
 	ASWeapon* currentGun;
 	

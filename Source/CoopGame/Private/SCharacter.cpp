@@ -106,16 +106,21 @@ void ASCharacter::EndZoom()
 
 void ASCharacter::ScrollEquipmentUp()
 {
-	/*maxEquipmentSize = Weapons.Num() - 1;
+	CurrentWeapon->Destroy();
+	maxEquipmentSize = Weapons.Num() - 1;
 	++currentEquipmentSlot;
 	if (currentEquipmentSlot > maxEquipmentSize) {
 		currentEquipmentSlot = 0;
 	}
-	gun->SetActorHiddenInGame = false;
-	gun = GetWorld()->SpawnActor<AActor>(Weapons[0], GetActorLocation(), FRotator::ZeroRotator);
-	gun->SetOwner(GetOwner());
-	socketName = "Weapon Socket";
-	gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);*/
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(Weapons[currentEquipmentSlot], FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+	if (CurrentWeapon) {
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
+
+	}
 	
 	
 	
@@ -124,17 +129,21 @@ void ASCharacter::ScrollEquipmentUp()
 
 void ASCharacter::ScrollEquipmentDown()
 {	
-	//maxEquipmentSize = Weapons.Num() - 1;
-	//--currentEquipmentSlot;
-	//if (currentEquipmentSlot < 0) {
-	//	currentEquipmentSlot = maxEquipmentSize;
-	//}
-	//previousGun = gun;
-	//gun = GetWorld()->SpawnActor<AActor>(Weapons[0], GetActorLocation(), FRotator::ZeroRotator);
-	//gun->SetOwner(GetOwner());
-	//socketName = "Weapon Socket";
-	//gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
-	//currentGun = gun;
+	CurrentWeapon->Destroy();
+	maxEquipmentSize = Weapons.Num() - 1;
+	--currentEquipmentSlot;
+	if (currentEquipmentSlot < 0) {
+		currentEquipmentSlot = maxEquipmentSize;
+	}
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(Weapons[currentEquipmentSlot], FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+	if (CurrentWeapon) {
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
+
+	}
 }
 
 
