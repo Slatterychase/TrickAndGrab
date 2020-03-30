@@ -156,10 +156,17 @@ void ASCharacter::ToggleFireMode()
 
 
 
-void ASCharacter::Fire()
+void ASCharacter::StartFire()
 {
 	if (CurrentWeapon) {
-		CurrentWeapon->Fire();
+		CurrentWeapon->StartFire();
+	}
+}
+
+void ASCharacter::StopFire()
+{
+	if (CurrentWeapon) {
+		CurrentWeapon->StopFire();
 	}
 }
 
@@ -196,7 +203,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("InventoryUp", IE_Pressed, this, &ASCharacter::ScrollEquipmentUp);
 	PlayerInputComponent->BindAction("InventoryDown", IE_Pressed, this, &ASCharacter::ScrollEquipmentDown);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASCharacter::StopFire);
 	PlayerInputComponent->BindAction("ToggleFire", IE_Pressed, this, &ASCharacter::ToggleFireMode);
 }
 

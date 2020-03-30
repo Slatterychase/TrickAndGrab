@@ -22,6 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Fire();
 
+	void StartFire();
+
+	void StopFire();
+
 	void SwapFireType();
 
 protected:
@@ -29,7 +33,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USkeletalMeshComponent* MeshComp;
 
-	
+	virtual void BeginPlay();
 
 	void PlayFireEffects(FVector TracerEndPoint);
 
@@ -54,7 +58,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	UParticleSystem* TracerEffect;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+		float BaseDamage;
+
 	bool AltFireType;
+
+	float LastFireTime;
+	//RPM- Bullets per minute
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	float RateOfFire;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+		float AltFireRate;
+
+	float ShotGap;
+	FTimerHandle TimeBetweenShots;
 public:	
 
 };
