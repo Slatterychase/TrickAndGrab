@@ -7,6 +7,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Components/CapsuleComponent.h"
+#include "CoopGame.h"
+#include "Components/SHealthComponent.h"
+
 #include "SWeapon.h"
 
 // Sets default values
@@ -24,6 +28,10 @@ ASCharacter::ASCharacter()
 
 	//Needs to set crouch, even if not AI
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
+
+	HealthComponent = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -70,6 +78,8 @@ void ASCharacter::BeginPlay()
 		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
 
 	}
+
+	HealthComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 
 }
 
@@ -167,6 +177,23 @@ void ASCharacter::StopFire()
 {
 	if (CurrentWeapon) {
 		CurrentWeapon->StopFire();
+	}
+}
+
+void ASCharacter::OnHealthChanged(USHealthComponent* HealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+	class AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0.0f && !bDied) {
+		//die
+
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		DetachFromControllerPendingDestroy();
+		bDied = true;
+
+
+		SetLifeSpan(10.0f);
 	}
 }
 
