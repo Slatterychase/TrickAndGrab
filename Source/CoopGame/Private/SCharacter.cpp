@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "CoopGame.h"
 #include "Components/SHealthComponent.h"
+#include "Net/UnrealNetwork.h"
 
 #include "SWeapon.h"
 
@@ -67,19 +68,25 @@ void ASCharacter::BeginPlay()
 	}*/
 
 	DefaultFOV = CameraComp->FieldOfView;
+	HealthComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 	//Spawn default weapon
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	
+	if (Role == ROLE_Authority) //Only runs this on the server
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
-	if (CurrentWeapon) {
-		CurrentWeapon->SetOwner(this);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
+		if (CurrentWeapon) {
+			CurrentWeapon->SetOwner(this);
+			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
 
+		}
 	}
+	
 
-	HealthComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+	
 
 }
 
@@ -161,6 +168,13 @@ void ASCharacter::ToggleFireMode()
 	CurrentWeapon->SwapFireType();
 }
 
+void ASCharacter::ReloadWeapon()
+{
+	if (CurrentWeapon) {
+		CurrentWeapon->Reload();
+	}
+}
+
 
 
 
@@ -233,5 +247,17 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASCharacter::StopFire);
 	PlayerInputComponent->BindAction("ToggleFire", IE_Pressed, this, &ASCharacter::ToggleFireMode);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASCharacter::ReloadWeapon);
+	
+}
+
+//This specifies what we want to replicate and how
+void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASCharacter, CurrentWeapon);
+	DOREPLIFETIME(ASCharacter, Weapons);
+	DOREPLIFETIME(ASCharacter, maxEquipmentSize);
 }
 

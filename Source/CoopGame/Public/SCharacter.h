@@ -51,18 +51,21 @@ protected:
 
 	void ToggleFireMode();
 
+	void ReloadWeapon();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Equipment")
 	TArray<TSubclassOf<ASWeapon>> Weapons;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	ASWeapon* currentGun;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", Replicated)
+	ASWeapon* currentGun;*/
 	
 	ASWeapon* previousGun;
 	int32 currentEquipmentSlot;
-	
+
+	UPROPERTY(Replicated)
 	int32 maxEquipmentSize;
 
 	ASWeapon* gun;
@@ -80,6 +83,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName socketName;
 
+	UPROPERTY(Replicated)
 	ASWeapon* CurrentWeapon;
 
 
